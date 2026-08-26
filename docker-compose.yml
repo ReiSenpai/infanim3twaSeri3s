@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # 1. Base de Datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: anime-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: animeweb_db
+      MYSQL_USER: user_anime
+      MYSQL_PASSWORD: password_seguro
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - anime-network
+
+  # 2. Backend Spring Boot
+  backend:
+    build:
+      context: ./backend # Ajusta esta ruta a tu carpeta del backend
+      dockerfile: Dockerfile
+    container_name: anime-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      # Conectamos Spring Boot al contenedor de MySQL (nota que usamos el nombre 'db')
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/animeweb_db?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: user_anime
+      SPRING_DATASOURCE_PASSWORD: password_seguro
+      # Las variables de Clerk y Telegram que uses en tu application.properties
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+    depends_on:
+      - db
+    networks:
+      - anime-network
+
+  # 3. Frontend Next.js
+  frontend:
+    build:
+      context: ./anime-twa # Ajusta esta ruta a tu carpeta del frontend
+      dockerfile: Dockerfile
+    container_name: anime-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      # Aquí pones la URL pública de tu backend para que Next.js se conecte
+      # Ej: NEXT_PUBLIC_API_URL: http://tu-ip-ec2:8080
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+    depends_on:
+      - backend
+    networks:
+      - anime-network
+
+# Definimos el volumen persistente para MySQL
+volumes:
+  mysql_data:
+
+# Definimos la red interna para que los contenedores se hablen entre sí
+networks:
+  anime-network:
+    driver: bridge
