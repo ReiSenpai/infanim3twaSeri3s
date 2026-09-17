@@ -296,7 +296,7 @@ export default function EpisodePage({
           className={`glass-panel overflow-hidden group shadow-2xl bg-black transition-all duration-300 ${
             isCssFullscreen 
               ? "fixed inset-0 z-[9999] w-screen h-screen flex items-center justify-center rounded-none" 
-              : "relative w-full md:w-[85%] lg:w-[75%] max-w-4xl mx-auto aspect-video mb-6"
+              : "relative w-full aspect-video mb-6"
           }`}
         >
           <iframe
