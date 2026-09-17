@@ -135,7 +135,7 @@ export default function AdminDashboard() {
 
   const handleSubmitAn = async (e: React.FormEvent) => {
     e.preventDefault(); setLoadingAn(true); setMsgAn({ text: "", type: "" });
-    const url = editingAnimeId ? `https://anime-backend-prod.onrender.com/api/v1/admin/animes/${editingAnimeId}` : "hhttps://anime-backend-prod.onrender.com/api/v1/admin/animes";
+    const url = editingAnimeId ? `https://anime-backend-prod.onrender.com/api/v1/admin/animes/${editingAnimeId}` : "https://anime-backend-prod.onrender.com/api/v1/admin/animes";
     const method = editingAnimeId ? "PUT" : "POST";
     try {
       // Empaquetamos los géneros separados por comas

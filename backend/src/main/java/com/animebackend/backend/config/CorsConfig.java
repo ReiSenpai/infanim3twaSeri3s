@@ -14,7 +14,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry){
                 registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000\", \"https://infanimetv.vercel.app") // Solucionado: http en lugar de https
+                .allowedOrigins("http://localhost:3000", "https://infanimetv.vercel.app") // Solucionado: http en lugar de https
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
