@@ -82,9 +82,9 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     try {
       const [resAnimes, resEpisodes, resChannels] = await Promise.all([
-        fetch("http://localhost:8080/api/v1/admin/animes"),
-        fetch("http://localhost:8080/api/v1/admin/episodes"),
-        fetch("http://localhost:8080/api/v1/admin/channels").catch(() => null)
+        fetch("https://anime-backend-prod.onrender.com/api/v1/admin/animes"),
+        fetch("https://anime-backend-prod.onrender.com/api/v1/admin/episodes"),
+        fetch("https://anime-backend-prod.onrender.com/api/v1/admin/channels").catch(() => null)
       ]);
       if (resAnimes.ok) setAnimes(await resAnimes.json());
       if (resEpisodes.ok) setEpisodes(await resEpisodes.json());
@@ -112,7 +112,7 @@ export default function AdminDashboard() {
   const handleChangeEp = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => setFormDataEp({ ...formDataEp, [e.target.name]: e.target.value });
   const handleSubmitEp = async (e: React.FormEvent) => {
     e.preventDefault(); setLoadingEp(true); setMsgEp({ text: "", type: "" });
-    const url = editingEpisodeId ? `http://localhost:8080/api/v1/admin/episodes/${editingEpisodeId}` : "http://localhost:8080/api/v1/admin/episodes";
+    const url = editingEpisodeId ? `https://anime-backend-prod.onrender.com/api/v1/admin/episodes/${editingEpisodeId}` : "https://anime-backend-prod.onrender.com/api/v1/admin/episodes";
     const method = editingEpisodeId ? "PUT" : "POST";
     try {
       const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(formDataEp) });
@@ -120,7 +120,7 @@ export default function AdminDashboard() {
     } catch (err: unknown) { setMsgEp({ text: err instanceof Error ? err.message : "Error", type: "error" }); } finally { setLoadingEp(false); }
   };
   const handleEditEp = (ep: Episode) => { setEditingEpisodeId(ep.id); setFormDataEp({ animeId: ep.anime?.slug || "", animeTitle: ep.anime?.title || "", episodeNumber: ep.episodeNumber.toString(), videoUrl: ep.videoUrl, synopsis: ep.synopsis || "" }); window.scrollTo({ top: 0, behavior: 'smooth' }); };
-  const handleDeleteEp = async (id: number) => { if (!window.confirm("¿Eliminar?")) return; try { const res = await fetch(`http://localhost:8080/api/v1/admin/episodes/${id}`, { method: "DELETE" }); if (res.ok) fetchData(); } catch (error) { console.error(error); } };
+  const handleDeleteEp = async (id: number) => { if (!window.confirm("¿Eliminar?")) return; try { const res = await fetch(`https://anime-backend-prod.onrender.com/api/v1/admin/episodes/${id}`, { method: "DELETE" }); if (res.ok) fetchData(); } catch (error) { console.error(error); } };
   const cancelEditEp = () => { setEditingEpisodeId(null); setFormDataEp({ animeId: "", animeTitle: "", episodeNumber: "", videoUrl: "", synopsis: "" }); };
 
   // ================= ANIMES =================
@@ -135,7 +135,7 @@ export default function AdminDashboard() {
 
   const handleSubmitAn = async (e: React.FormEvent) => {
     e.preventDefault(); setLoadingAn(true); setMsgAn({ text: "", type: "" });
-    const url = editingAnimeId ? `http://localhost:8080/api/v1/admin/animes/${editingAnimeId}` : "http://localhost:8080/api/v1/admin/animes";
+    const url = editingAnimeId ? `https://anime-backend-prod.onrender.com/api/v1/admin/animes/${editingAnimeId}` : "hhttps://anime-backend-prod.onrender.com/api/v1/admin/animes";
     const method = editingAnimeId ? "PUT" : "POST";
     try {
       // Empaquetamos los géneros separados por comas
@@ -156,14 +156,14 @@ export default function AdminDashboard() {
     setSelectedGenres(anime.genre ? anime.genre.split(", ") : []);
     window.scrollTo({ top: 0, behavior: 'smooth' }); 
   };
-  const handleDeleteAn = async (id: number) => { if (!window.confirm("¿Borrar Anime y episodios?")) return; try { const res = await fetch(`http://localhost:8080/api/v1/admin/animes/${id}`, { method: "DELETE" }); if (res.ok) fetchData(); } catch (error) { console.error(error); } };
+  const handleDeleteAn = async (id: number) => { if (!window.confirm("¿Borrar Anime y episodios?")) return; try { const res = await fetch(`https://anime-backend-prod.onrender.com/api/v1/admin/animes/${id}`, { method: "DELETE" }); if (res.ok) fetchData(); } catch (error) { console.error(error); } };
   const cancelEditAn = () => { setEditingAnimeId(null); setFormDataAn({ slug: "", title: "", coverUrl: "", synopsis: "", status: "EMISION", releaseYear: new Date().getFullYear().toString(), season: "Primavera" }); setSelectedGenres([]); };
 
   // ================= CANALES =================
   const handleChangeCh = (e: React.ChangeEvent<HTMLInputElement>) => setFormDataCh({ ...formDataCh, [e.target.name]: e.target.value });
   const handleSubmitCh = async (e: React.FormEvent) => {
     e.preventDefault(); setLoadingCh(true); setMsgCh({ text: "", type: "" });
-    const url = editingChannelId ? `http://localhost:8080/api/v1/admin/channels/${editingChannelId}` : "http://localhost:8080/api/v1/admin/channels";
+    const url = editingChannelId ? `https://anime-backend-prod.onrender.com/api/v1/admin/channels/${editingChannelId}` : "https://anime-backend-prod.onrender.com/api/v1/admin/channels";
     const method = editingChannelId ? "PUT" : "POST";
     try {
       const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(formDataCh) });
@@ -171,7 +171,7 @@ export default function AdminDashboard() {
     } catch (err: unknown) { setMsgCh({ text: err instanceof Error ? err.message : "Error", type: "error" }); } finally { setLoadingCh(false); }
   };
   const handleEditCh = (channel: TelegramChannel) => { setEditingChannelId(channel.id); setFormDataCh({ name: channel.name, chatId: channel.chatId }); window.scrollTo({ top: 0, behavior: 'smooth' }); };
-  const handleDeleteCh = async (id: number) => { if (!window.confirm("¿Desvincular canal?")) return; try { const res = await fetch(`http://localhost:8080/api/v1/admin/channels/${id}`, { method: "DELETE" }); if (res.ok) fetchData(); } catch (error) { console.error(error); } };
+  const handleDeleteCh = async (id: number) => { if (!window.confirm("¿Desvincular canal?")) return; try { const res = await fetch(`https://anime-backend-prod.onrender.com/api/v1/admin/channels/${id}`, { method: "DELETE" }); if (res.ok) fetchData(); } catch (error) { console.error(error); } };
   const cancelEditCh = () => { setEditingChannelId(null); setFormDataCh({ name: "", chatId: "" }); };
 
   if (!isAdmin) return <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white"><h1 className="text-red-400 text-xl font-bold">Cargando...</h1></div>;
