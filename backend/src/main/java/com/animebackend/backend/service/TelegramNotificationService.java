@@ -22,7 +22,7 @@ public class TelegramNotificationService {
     private TelegramChannelRepository channelRepository;
 
     // 🔥 CORREGIDO: Sin espacios en blanco al final de la URL
-    private final String webAppBaseUrl = "https://carry-experiments-electro-represented.trycloudflare.com";
+    private final String webAppBaseUrl = "https://infanimetv.vercel.app";
 
     private final RestTemplate restTemplate = new RestTemplate();
 

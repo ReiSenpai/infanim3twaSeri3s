@@ -4,8 +4,9 @@ const nextConfig: NextConfig = {
   output: "standalone",
   /* config options here */
   allowedDevOrigins: [
-    "carry-experiments-electro-represented.trycloudflare.com",
-    'program-taste-quickstep.ngrok-free.dev'],
+    "infanimetv.vercel.app",
+    "localhost:3000"
+  ],
   // Hacemos que Next.js funcione como un puente hacia Spring Boot
   async rewrites() {
     return [
