@@ -34,7 +34,6 @@ export default function AnimeDetailsPage({ params }: { params: Promise<{ animeId
 
     const fetchData = async () => {
       try {
-        // Obtenemos todos los animes y buscamos el que coincida
         const resAnimes = await fetch("/api/v1/admin/animes");
         if (resAnimes.ok) {
           const allAnimes: Anime[] = await resAnimes.json();
@@ -42,11 +41,9 @@ export default function AnimeDetailsPage({ params }: { params: Promise<{ animeId
           if (currentAnime) setAnime(currentAnime);
         }
 
-        // Obtenemos los episodios y los filtramos
         const resEps = await fetch("/api/v1/admin/episodes");
         if (resEps.ok) {
           const allEps: Episode[] = await resEps.json();
-          // Filtramos solo los episodios de este anime y los ordenamos de 1 a X
           const filteredEps = allEps
             .filter(ep => ep.anime?.slug === animeId)
             .sort((a, b) => a.episodeNumber - b.episodeNumber);
@@ -85,61 +82,112 @@ export default function AnimeDetailsPage({ params }: { params: Promise<{ animeId
         .glass-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); }
       `}} />
 
-      {/* PORTADA Y TÍTULO */}
-      <div className="relative w-full h-64 md:h-80">
-        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/60 to-transparent z-10"></div>
+      {/* ========================================= */}
+      {/* SECCIÓN HERO (FONDO DIFUMINADO)           */}
+      {/* ========================================= */}
+      <div className="relative w-full h-[250px] md:h-[350px] overflow-hidden border-b border-white/5">
         {anime.coverUrl && (
-          <Image src={anime.coverUrl} alt={anime.title} fill unoptimized className="object-cover opacity-60" />
+          <Image 
+            src={anime.coverUrl} 
+            alt="Background" 
+            fill 
+            unoptimized 
+            className="object-cover blur-xl opacity-30 scale-110" 
+          />
         )}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent z-10"></div>
         
-        <Link href="/catalog" className="absolute top-4 left-4 z-20 bg-black/50 backdrop-blur-md p-2 rounded-full border border-white/10 text-white active:scale-95">
+        {/* Botón Volver */}
+        <Link href="/catalog" className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20 bg-black/50 backdrop-blur-md p-2.5 rounded-full border border-white/10 text-white active:scale-95 hover:bg-white/10 transition-colors shadow-lg">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
         </Link>
+      </div>
 
-        <div className="absolute bottom-0 left-0 w-full p-5 z-20">
-          <span className={`px-2 py-1 text-[10px] font-bold rounded border ${anime.status === 'EMISION' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-gray-500/20 text-gray-300 border-gray-500/30'} mb-2 inline-block`}>
-            {anime.status === 'EMISION' ? '🟢 EN EMISIÓN' : '🔴 FINALIZADO'}
-          </span>
-          <h1 className="text-3xl font-black tracking-tighter leading-tight drop-shadow-lg">{anime.title}</h1>
+      {/* ========================================= */}
+      {/* CONTENIDO PRINCIPAL SUPERPUESTO           */}
+      {/* ========================================= */}
+      <div className="relative z-20 max-w-6xl mx-auto px-5 -mt-24 md:-mt-40">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-center md:items-end mb-8">
+          
+          {/* Portada Visible y sin recortes */}
+          <div className="relative w-40 h-56 md:w-56 md:h-80 shrink-0 rounded-xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.8)] border border-white/10 bg-black">
+            {anime.coverUrl && (
+              <Image 
+                src={anime.coverUrl} 
+                alt={anime.title} 
+                fill 
+                unoptimized 
+                className="object-cover" 
+              />
+            )}
+          </div>
+
+          {/* Título y Estado */}
+          <div className="flex flex-col items-center md:items-start text-center md:text-left w-full pb-2 md:pb-4">
+            <span className={`px-3 py-1 text-xs font-bold rounded-md border ${anime.status === 'EMISION' ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-gray-500/20 text-gray-300 border-gray-500/30'} mb-3 inline-block shadow-sm`}>
+              {anime.status === 'EMISION' ? '🔴 EN EMISIÓN' : '⚪ FINALIZADO'}
+            </span>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tighter leading-tight drop-shadow-lg text-white">
+              {anime.title}
+            </h1>
+          </div>
+        </div>
+
+        {/* Sinopsis */}
+        <div className="w-full">
+          <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-white/90">
+            <span className="w-1 h-5 bg-purple-500 rounded-full inline-block shadow-[0_0_10px_rgba(147,51,234,0.8)]"></span>
+            Sinopsis
+          </h2>
+          <p className="text-gray-300 text-sm md:text-base leading-relaxed text-justify glass-panel p-5 md:p-6 rounded-xl shadow-lg">
+            {anime.synopsis || "No hay sinopsis disponible para este anime."}
+          </p>
         </div>
       </div>
 
-      {/* SINOPSIS */}
-      <div className="px-5 mt-4">
-        <p className="text-gray-300 text-sm leading-relaxed text-justify glass-panel p-4 rounded-xl">
-          {anime.synopsis}
-        </p>
-      </div>
-
-      {/* LISTA DE CAPÍTULOS */}
-      <div className="px-5 mt-8">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <span className="w-1 h-5 bg-blue-500 rounded-full inline-block"></span>
-          Lista de Capítulos ({episodes.length})
+      {/* ========================================= */}
+      {/* LISTA DE CAPÍTULOS RESPONSIVA             */}
+      {/* ========================================= */}
+      <div className="max-w-6xl mx-auto px-5 mt-12">
+        <h2 className="text-xl md:text-2xl font-bold mb-6 flex items-center gap-3">
+          <span className="w-1.5 h-6 bg-blue-500 rounded-full inline-block shadow-[0_0_10px_rgba(59,130,246,0.8)]"></span>
+          Lista de Capítulos <span className="text-gray-500 text-sm font-normal">({episodes.length})</span>
         </h2>
         
         {episodes.length === 0 ? (
-          <div className="text-center text-gray-500 py-8 glass-card rounded-xl">
-            Aún no hay capítulos disponibles.
+          <div className="text-center text-gray-500 py-10 glass-card rounded-xl border border-dashed border-white/10">
+            <p className="text-lg font-semibold">Aún no hay capítulos disponibles.</p>
+            <p className="text-sm mt-1">Vuelve más tarde para ver los estrenos.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-3">
+          /* Grid Responsivo para los episodios */
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {episodes.map((ep) => (
               <Link key={ep.id} href={`/anime/${anime.slug}/ep-${ep.episodeNumber}`}>
-                <div className="glass-card p-4 rounded-xl flex items-center justify-between active:scale-95 transition-transform hover:bg-white/5 group">
+                <div className="glass-card p-4 rounded-xl flex items-center justify-between active:scale-95 transition-all hover:bg-white/5 hover:border-white/10 group shadow-md hover:shadow-lg">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    
+                    {/* Número de episodio estilizado */}
+                    <div className="w-12 h-12 shrink-0 rounded-xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-black text-lg group-hover:bg-blue-600 group-hover:text-white transition-colors shadow-inner">
                       {ep.episodeNumber}
                     </div>
-                    <div>
-                      <p className="font-semibold text-white">Episodio {ep.episodeNumber}</p>
-                      <p className="text-xs text-gray-400">Sub Español</p>
+                    
+                    {/* Detalles del episodio */}
+                    <div className="flex flex-col overflow-hidden">
+                      <p className="font-bold text-white truncate">Episodio {ep.episodeNumber}</p>
+                      <span className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+                        <svg className="w-3 h-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                        Sub Español
+                      </span>
                     </div>
                   </div>
-                  <svg className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
+
+                  {/* Icono de Play interactivo */}
+                  <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-blue-500 transition-colors shrink-0">
+                    <svg className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
                 </div>
               </Link>
             ))}
