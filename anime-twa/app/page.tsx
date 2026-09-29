@@ -100,7 +100,7 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white p-4 md:p-6 overflow-x-hidden flex flex-col">
+    <main className="min-h-screen bg-[#050505] text-white p-4 md:p-6 flex flex-col w-full">
       
       {/* 🔥 2. Usamos el componente Navbar */}
       <FadeUpSection delayMs={50}>
