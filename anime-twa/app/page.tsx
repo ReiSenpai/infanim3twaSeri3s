@@ -119,7 +119,7 @@ export default function HomePage() {
                 </p>
                 <h2 className="text-2xl md:text-3xl font-black tracking-tighter glow-text">Últimos Estrenos</h2>
               </div>
-              <Link href="/catalog">
+              <Link href="/catalogo">
                 <button className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-bold active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(37,99,235,0.3)] border border-blue-400/50">
                   <span>Ir al Catálogo</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>

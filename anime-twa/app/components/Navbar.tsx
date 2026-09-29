@@ -42,10 +42,10 @@ export default function Navbar() {
         </Link>
 
         {/* Botón Catálogo */}
-        <Link href="/catalog">
+        <Link href="/catalogo">
           <button 
             className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 flex items-center gap-2 ${
-              pathname?.startsWith("/catalog")
+              pathname?.startsWith("/catalogo")
                 ? "bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.4)] border border-purple-400/50" 
                 : "bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white"
             }`}
