@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 export default function Navbar() {
@@ -12,18 +13,27 @@ export default function Navbar() {
       {/* Borde superior decorativo */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-cyan-400 to-purple-500"></div>
 
-      {/* IZQUIERDA: Logo y Subtítulo */}
-      <Link href="/" className="flex flex-col items-center md:items-start z-10 group">
-        <h1 className="text-xl md:text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 drop-shadow-md group-hover:scale-[1.02] transition-transform origin-left">
-          SOMOS <span className="text-blue-400 glow-text">INFANIME</span>
-        </h1>
-        <p className="text-[9px] md:text-[10px] text-gray-400 uppercase tracking-[0.2em] font-bold mt-1">
+      {/* IZQUIERDA: Logo (Imagen) y Subtítulo */}
+      <Link href="/" className="flex flex-col items-center md:items-start z-10 group gap-1.5">
+        
+        {/* Contenedor de la Imagen del Logo */}
+        <div className="relative w-36 h-12 md:w-44 md:h-14 group-hover:scale-[1.02] transition-transform origin-center md:origin-left">
+          <Image 
+            src="/Somosinf.png" 
+            alt="Somos Infanime Logo" 
+            fill 
+            className="object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" 
+            priority
+          />
+        </div>
+
+        <p className="text-[9px] md:text-[10px] text-gray-400 uppercase tracking-[0.2em] font-bold">
           La mejor comunidad Anime
         </p>
       </Link>
 
       {/* DERECHA: Botones de Rutas */}
-      <nav className="flex items-center gap-3 z-10 w-full md:w-auto justify-center md:justify-end border-t border-white/5 md:border-none pt-3 md:pt-0 mt-1 md:mt-0">
+      <nav className="flex items-center gap-3 z-10 w-full md:w-auto justify-center md:justify-end border-t border-white/5 md:border-none pt-4 md:pt-0 mt-1 md:mt-0">
         
         {/* Botón Inicio */}
         <Link href="/">

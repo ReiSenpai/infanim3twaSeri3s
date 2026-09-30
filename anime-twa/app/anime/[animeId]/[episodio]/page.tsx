@@ -232,7 +232,7 @@ export default function EpisodePage({
   }
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white overflow-x-hidden flex flex-col w-full">
+    <main className="min-h-screen bg-[#050505] text-white flex flex-col w-full">
       {/* Estilos específicos para el modo pantalla completa */}
       <style
         dangerouslySetInnerHTML={{
@@ -250,31 +250,31 @@ export default function EpisodePage({
       />
 
       {/* NAVBAR */}
-      <div className="px-5 pt-4 md:px-10 lg:px-16 xl:px-24">
+      <div className="px-3 sm:px-5 md:px-8 lg:px-12 pt-4">
         <Navbar />
       </div>
 
-      {/* CONTENEDOR PRINCIPAL DEL REPRODUCTOR */}
-      <div className="w-full px-5 md:px-10 lg:px-16 xl:px-24 max-w-7xl mx-auto flex flex-col mb-auto">
+      {/* CONTENEDOR PRINCIPAL DEL REPRODUCTOR (Ancho Total) */}
+      <div className="w-full px-3 sm:px-5 md:px-8 lg:px-12 flex flex-col mb-auto">
         
         <FadeUpSection>
           <header className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-4">
-            <div>
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-3">
-                <span className="px-3 py-1 text-[10px] md:text-xs font-black tracking-wider uppercase bg-purple-600/20 text-purple-400 rounded-md border border-purple-500/30 shadow-sm">
+                <span className="px-3 py-1 text-[10px] md:text-xs font-black tracking-wider uppercase bg-purple-600/20 text-purple-400 rounded-md border border-purple-500/30 shadow-sm shrink-0">
                   Episodio {currentEpNum}
                 </span>
-                <span className="text-[10px] md:text-xs text-gray-400 font-mono opacity-80">
+                <span className="text-[10px] md:text-xs text-gray-400 font-mono opacity-80 truncate">
                   {tgUser ? `Viendo como ${tgUser}` : "Modo espectador"}
                 </span>
               </div>
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter glow-text leading-tight text-white/90">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter glow-text leading-tight text-white/90 truncate">
                 {episodeData.title}
               </h1>
             </div>
             
             {/* Botón Volver al Anime */}
-            <Link href={`/anime/${animeId}`}>
+            <Link href={`/anime/${animeId}`} className="shrink-0">
               <button className="w-full md:w-auto px-5 py-2.5 glass-panel rounded-xl text-sm font-bold text-gray-300 hover:text-white hover:bg-white/10 active:scale-95 transition-all flex items-center justify-center gap-2 border-white/10">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -286,13 +286,13 @@ export default function EpisodePage({
         </FadeUpSection>
 
         <FadeUpSection delayMs={100}>
-          {/* REPRODUCTOR DE VIDEO */}
+          {/* REPRODUCTOR DE VIDEO INMERSIVO (Ancho 100%) */}
           <div 
             ref={videoContainerRef} 
-            className={`glass-panel overflow-hidden group shadow-2xl bg-black transition-all duration-300 border-white/10 ${
+            className={`glass-panel overflow-hidden group bg-black transition-all duration-300 border-white/10 shadow-[0_0_50px_rgba(37,99,235,0.1)] ${
               isCssFullscreen 
                 ? "fixed inset-0 z-[9999] w-screen h-screen flex items-center justify-center rounded-none" 
-                : "relative w-full aspect-video mb-6 rounded-2xl"
+                : "relative w-full aspect-video mb-8 rounded-xl md:rounded-2xl"
             }`}
           >
             <iframe
@@ -305,7 +305,7 @@ export default function EpisodePage({
             
             <button 
               onClick={toggleFullScreen}
-              className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md p-2.5 rounded-xl border border-white/10 text-white opacity-0 group-hover:opacity-100 transition-opacity active:scale-95 z-50 hover:bg-black/80"
+              className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md p-2.5 rounded-xl border border-white/10 text-white opacity-0 group-hover:opacity-100 transition-opacity active:scale-95 z-50 hover:bg-black/80 shadow-lg"
               title="Pantalla Completa"
             >
               {isCssFullscreen ? (
@@ -314,7 +314,7 @@ export default function EpisodePage({
                 </svg>
               ) : (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                 </svg>
               )}
             </button>
@@ -322,8 +322,8 @@ export default function EpisodePage({
         </FadeUpSection>
 
         <FadeUpSection delayMs={200}>
-          {/* CONTROLES ANTERIOR Y SIGUIENTE */}
-          <div className="mb-10 flex flex-row justify-between gap-4">
+          {/* CONTROLES ANTERIOR Y SIGUIENTE (Justificados) */}
+          <div className="mb-10 flex flex-row justify-between gap-4 max-w-4xl mx-auto w-full">
             {hasPrev ? (
               <Link href={`/anime/${animeId}/ep-${currentEpNum - 1}`} className="flex-1">
                 <button className="w-full glass-panel py-3.5 md:py-4 text-sm font-bold text-white hover:bg-white/10 border-white/10 active:scale-95 transition-all flex items-center justify-center gap-2 rounded-xl">
@@ -356,7 +356,7 @@ export default function EpisodePage({
 
         <FadeUpSection delayMs={300}>
           {/* SINOPSIS DEL EPISODIO */}
-          <div className="glass-panel p-6 md:p-8 rounded-2xl mb-8 border-white/5">
+          <div className="glass-panel p-6 md:p-8 rounded-2xl mb-8 border-white/5 max-w-5xl mx-auto w-full">
             <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-white/90">
               <span className="w-1.5 h-6 bg-purple-500 rounded-full inline-block shadow-[0_0_10px_rgba(147,51,234,0.8)]"></span>
               Sinopsis del Episodio
@@ -370,7 +370,7 @@ export default function EpisodePage({
       </div>
 
       {/* FOOTER */}
-      <div className="px-5 md:px-10 lg:px-16 xl:px-24">
+      <div className="px-3 sm:px-5 md:px-8 lg:px-12 mt-auto">
         <Footer />
       </div>
 
