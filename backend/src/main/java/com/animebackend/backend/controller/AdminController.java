@@ -9,6 +9,7 @@ import com.animebackend.backend.entity.Anime;
 import com.animebackend.backend.entity.Episode;
 import com.animebackend.backend.repository.AnimeRepository;
 import com.animebackend.backend.repository.EpisodeRepository;
+import com.animebackend.backend.service.AnimeService; // 🔥 Importamos el AnimeService
 import com.animebackend.backend.service.TelegramNotificationService;
 
 import java.util.Optional;
@@ -26,6 +27,9 @@ public class AdminController {
 
     @Autowired
     private EpisodeRepository episodeRepository;
+
+    @Autowired
+    private AnimeService animeService; // 🔥 Inyectamos el servicio
 
     // ==========================================
     // GESTIÓN DE EPISODIOS
@@ -116,8 +120,11 @@ public class AdminController {
                 return ResponseEntity.badRequest().body("{\"error\": \"Ya existe un anime con este ID (Slug).\"}");
             }
             
-            animeRepository.save(nuevoAnime);
-            return ResponseEntity.ok().body("{\"message\": \"Anime registrado correctamente.\"}");
+            // 🔥 AQUI EL CAMBIO MÁS IMPORTANTE: 
+            // Usamos animeService.crearAnime() en lugar de animeRepository.save()
+            animeService.crearAnime(nuevoAnime);
+            
+            return ResponseEntity.ok().body("{\"message\": \"Anime registrado y notificado correctamente.\"}");
             
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("{\"error\": \"" + e.getMessage() + "\"}");

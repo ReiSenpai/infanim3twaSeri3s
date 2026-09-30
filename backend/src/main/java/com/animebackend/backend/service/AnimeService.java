@@ -10,8 +10,10 @@ public interface AnimeService {
     // El nombre debe ser exactamente getEpisodeData
     EpisodeDto getEpisodeData(String animeSlug, Integer episodeNumber);
 
-    // Agrega esto en tu interfaz AnimeService
     List<RecentEpisodeDto> getRecentEpisodes();
 
     List<Anime> obtenerTodos();
+
+    // 🔥 NUEVO: Declaramos el método que guarda y notifica a Telegram
+    Anime crearAnime(Anime anime);
 }

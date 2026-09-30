@@ -7,6 +7,7 @@ import com.animebackend.backend.entity.Episode;
 import com.animebackend.backend.repository.AnimeRepository;
 import com.animebackend.backend.repository.EpisodeRepository;
 import com.animebackend.backend.service.AnimeService;
+import com.animebackend.backend.service.TelegramNotificationService; // 🔥 1. Importamos el servicio
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +22,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor // Esto le dice a Spring que inyecte animeRepository y episodeRepository automáticamente
+@RequiredArgsConstructor // Esto le dice a Spring que inyecte automáticamente las dependencias 'final'
 @Slf4j
 public class AnimeServiceImpl implements AnimeService {
 
     private final AnimeRepository animeRepository;
     private final EpisodeRepository episodeRepository;
+    private final TelegramNotificationService telegramNotificationService; // 🔥 2. Inyectamos el servicio de Telegram
 
     @Override
     @Transactional
@@ -107,5 +109,28 @@ public class AnimeServiceImpl implements AnimeService {
     @Override
     public List<Anime> obtenerTodos() {
         return animeRepository.findAll();
+    }
+
+    // 🔥 3. NUEVO MÉTODO: GUARDAR ANIME Y NOTIFICAR
+    // (Asegúrate de que este método esté declarado en tu interfaz AnimeService si la estás usando)
+    public Anime crearAnime(Anime anime) {
+        // Guardamos en MySQL primero para generar el ID y confirmar que es válido
+        Anime animeGuardado = animeRepository.save(anime);
+
+        // Disparamos la notificación de Telegram usando el bloque try-catch
+        // para evitar que un fallo en Telegram rompa el guardado del anime.
+        try {
+            telegramNotificationService.sendNewAnimeAlert(
+                animeGuardado.getTitle(),
+                animeGuardado.getSlug(),
+                animeGuardado.getCoverUrl(),
+                animeGuardado.getSynopsis()
+            );
+            log.info("Notificación de nuevo anime enviada a Telegram: {}", animeGuardado.getTitle());
+        } catch (Exception e) {
+            log.error("Error al enviar alerta a Telegram para {}: {}", animeGuardado.getTitle(), e.getMessage());
+        }
+
+        return animeGuardado;
     }
 }

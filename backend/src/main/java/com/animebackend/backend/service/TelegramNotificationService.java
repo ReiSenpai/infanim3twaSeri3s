@@ -21,28 +21,26 @@ public class TelegramNotificationService {
     @Autowired
     private TelegramChannelRepository channelRepository;
 
-    // 🔥 CORREGIDO: Sin espacios en blanco al final de la URL
     private final String webAppBaseUrl = "https://infanimetv.vercel.app";
 
     private final RestTemplate restTemplate = new RestTemplate();
 
+    // ==========================================
+    // NOTIFICACIÓN DE NUEVO EPISODIO (Texto)
+    // ==========================================
     public void sendNewEpisodeAlert(String animeTitle, String episodeNumber, String animeSlug) {
         String apiUrl = "https://api.telegram.org/bot" + botToken + "/sendMessage";
 
-        // 1. CREAR EL HASHTAG AUTOMÁTICO
         String hashtag = "#" + animeTitle.replaceAll("[^a-zA-Z0-9]", "");
 
-        // 2. Armamos el texto
         String message = "🎉 *¡Nuevo Episodio Disponible!*\n\n" +
                          "📺 Anime: *" + animeTitle + "*\n" +
                          "🎬 Episodio: " + episodeNumber + "\n\n" +
                          "Ya puedes verlo completo sin salir de Telegram. ¡Disfrútalo!\n\n" +
                          hashtag;
 
-        // 3. Enlace (Usamos el slug, que ya viene sin espacios desde la Base de Datos)
         String fullUrl = webAppBaseUrl + "/anime/" + animeSlug + "/ep-" + episodeNumber;
 
-        // 4. Creamos el botón
         Map<String, Object> button = new HashMap<>();
         button.put("text", "▶️ Ver Episodio");
         button.put("url", fullUrl); 
@@ -56,7 +54,6 @@ public class TelegramNotificationService {
         Map<String, Object> inlineKeyboard = new HashMap<>();
         inlineKeyboard.put("inline_keyboard", keyboard);
 
-        // 5. OBTENER TODOS LOS CANALES DESDE LA BASE DE DATOS
         List<TelegramChannel> canales = channelRepository.findAll();
 
         if(canales.isEmpty()) {
@@ -64,7 +61,6 @@ public class TelegramNotificationService {
             return;
         }
 
-        // 6. ENVIAR A CADA CANAL
         for (TelegramChannel canal : canales) {
             Map<String, Object> request = new HashMap<>();
             request.put("chat_id", canal.getChatId());
@@ -77,7 +73,68 @@ public class TelegramNotificationService {
                 System.out.println("✅ Notificación enviada al canal: " + canal.getName());
             } catch (Exception e) {
                 System.err.println("❌ Error al enviar notificación al canal " + canal.getName() + ": " + e.getMessage());
-                e.printStackTrace();
+            }
+        }
+    }
+
+    // ==========================================
+    // NOTIFICACIÓN DE NUEVO ANIME (Con Imagen)
+    // ==========================================
+    public void sendNewAnimeAlert(String animeTitle, String animeSlug, String coverUrl, String synopsis) {
+        // IMPORTANTE: Usamos sendPhoto en lugar de sendMessage
+        String apiUrl = "https://api.telegram.org/bot" + botToken + "/sendPhoto";
+
+        String hashtag = "#" + animeTitle.replaceAll("[^a-zA-Z0-9]", "");
+
+        // Telegram limita el 'caption' a 1024 caracteres. Prevenimos errores recortando la sinopsis si es gigante.
+        String safeSynopsis = (synopsis != null) ? synopsis : "Sinopsis no disponible.";
+        if (safeSynopsis.length() > 600) {
+            safeSynopsis = safeSynopsis.substring(0, 597) + "...";
+        }
+
+        String caption = "🎊 *¡NUEVO ANIME AGREGADO AL CATÁLOGO!*\n\n" +
+                         "📺 Título: *" + animeTitle + "*\n\n" +
+                         "📖 Sinopsis:\n_" + safeSynopsis + "_\n\n" +
+                         "¡Abre la app para empezar a verlo!\n\n" +
+                         hashtag;
+
+        // La ruta ahora apunta a la página general del anime, no a un episodio
+        String fullUrl = webAppBaseUrl + "/anime/" + animeSlug;
+
+        Map<String, Object> button = new HashMap<>();
+        button.put("text", "📚 Ver Ficha del Anime");
+        button.put("url", fullUrl); 
+
+        List<Map<String, Object>> row = new ArrayList<>();
+        row.add(button);
+
+        List<List<Map<String, Object>>> keyboard = new ArrayList<>();
+        keyboard.add(row);
+
+        Map<String, Object> inlineKeyboard = new HashMap<>();
+        inlineKeyboard.put("inline_keyboard", keyboard);
+
+        List<TelegramChannel> canales = channelRepository.findAll();
+
+        if(canales.isEmpty()) {
+            System.out.println("⚠️ ALERTA: Anime guardado, pero no hay canales registrados en la BD.");
+            return;
+        }
+
+        for (TelegramChannel canal : canales) {
+            Map<String, Object> request = new HashMap<>();
+            request.put("chat_id", canal.getChatId());
+            // Telegram admite directamente la URL de la imagen
+            request.put("photo", coverUrl);
+            request.put("caption", caption); // En fotos se usa 'caption', no 'text'
+            request.put("parse_mode", "Markdown");
+            request.put("reply_markup", inlineKeyboard);
+
+            try {
+                restTemplate.postForObject(apiUrl, request, String.class);
+                System.out.println("✅ Notificación de Anime enviada al canal: " + canal.getName());
+            } catch (Exception e) {
+                System.err.println("❌ Error al enviar alerta de Anime al canal " + canal.getName() + ": " + e.getMessage());
             }
         }
     }
