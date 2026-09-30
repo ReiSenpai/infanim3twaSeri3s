@@ -20,7 +20,7 @@ export default function Navbar() {
           {/* Logo mucho más grande, estilo AnimeYT */}
           <div className="relative w-44 h-16 md:w-56 md:h-20 group-hover:scale-105 transition-transform duration-300 origin-center md:origin-left">
             <Image 
-              src="/Somosinf.png" 
+              src="/Somosinfanime.png" 
               alt="Somos Infanime Logo" 
               fill 
               className="object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]" 
