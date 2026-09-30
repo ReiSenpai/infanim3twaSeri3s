@@ -13,11 +13,11 @@ export default function Navbar() {
       {/* Borde superior decorativo */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-cyan-400 to-purple-500"></div>
 
-      {/* IZQUIERDA: Logo (Imagen) y Subtítulo */}
-      <Link href="/" className="flex flex-col items-center md:items-start z-10 group gap-1.5">
+      {/* IZQUIERDA: Logo (Imagen) */}
+      <Link href="/" className="z-10 group flex items-center justify-center md:justify-start">
         
-        {/* Contenedor de la Imagen del Logo */}
-        <div className="relative w-36 h-12 md:w-44 md:h-14 group-hover:scale-[1.02] transition-transform origin-center md:origin-left">
+        {/* Contenedor de la Imagen del Logo ampliado */}
+        <div className="relative w-48 h-14 md:w-56 md:h-16 group-hover:scale-[1.02] transition-transform origin-center md:origin-left">
           <Image 
             src="/Somosinf.png" 
             alt="Somos Infanime Logo" 
@@ -27,9 +27,6 @@ export default function Navbar() {
           />
         </div>
 
-        <p className="text-[9px] md:text-[10px] text-gray-400 uppercase tracking-[0.2em] font-bold">
-          La mejor comunidad Anime
-        </p>
       </Link>
 
       {/* DERECHA: Botones de Rutas */}
