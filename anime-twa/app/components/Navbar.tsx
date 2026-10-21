@@ -4,8 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-
-import anime from "animejs/lib/anime.es.js";
+import anime from "animejs";
 
 const navLinks = [
   { name: "Inicio", path: "/" },
@@ -16,7 +15,6 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
-  // Tipado estricto para solucionar los errores de TypeScript
   const pillRef = useRef<HTMLDivElement | null>(null);
   const navRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
@@ -26,7 +24,6 @@ export default function Navbar() {
     );
 
     if (activeIndex !== -1 && navRefs.current[activeIndex] && pillRef.current) {
-      // Usamos el "!" para asegurarle a TS que el elemento existe
       const activeItem = navRefs.current[activeIndex]!;
       
       anime({
