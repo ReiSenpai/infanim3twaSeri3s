@@ -5,8 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
-// @ts-expect-error: La libreria animejs no tiene exportacion por defecto compatible
-import anime from "animejs";
+import anime from "animejs/lib/anime.es.js";
 
 const navLinks = [
   { name: "Inicio", path: "/" },
