@@ -26,6 +26,8 @@ interface Anime {
   season?: string;
 }
 
+const ITEMS_PER_PAGE = 24; // Cantidad de animes por página
+
 export default function CatalogPage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [animes, setAnimes] = useState<Anime[]>([]);
@@ -35,7 +37,11 @@ export default function CatalogPage() {
   const [filterYear, setFilterYear] = useState("");
   const [filterSeason, setFilterSeason] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [sortBy, setSortBy] = useState("NAME");
   const [sortOrder, setSortOrder] = useState("");
+
+  // ESTADO DE PAGINACIÓN
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.Telegram?.WebApp) {
@@ -60,6 +66,7 @@ export default function CatalogPage() {
     fetchAnimes();
   }, []);
 
+  // 1. Aplicamos los filtros
   const filteredAnimes = animes.filter((anime) => {
     const matchGenre = filterGenre ? anime.genre?.toLowerCase().includes(filterGenre.toLowerCase()) : true;
     const matchYear = filterYear ? anime.releaseYear?.toString() === filterYear : true;
@@ -68,16 +75,36 @@ export default function CatalogPage() {
     return matchGenre && matchYear && matchSeason && matchStatus;
   });
 
-  if (sortOrder === "ASC") {
-    filteredAnimes.sort((a, b) => a.title.localeCompare(b.title));
-  } else if (sortOrder === "DESC") {
-    filteredAnimes.sort((a, b) => b.title.localeCompare(a.title));
+  // 2. Aplicamos el ordenamiento sobre los resultados filtrados
+  if (sortBy === "NAME") {
+    if (sortOrder === "ASC") {
+      filteredAnimes.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (sortOrder === "DESC") {
+      filteredAnimes.sort((a, b) => b.title.localeCompare(a.title));
+    }
+  } else if (sortBy === "DATE") {
+    if (sortOrder === "ASC") {
+      filteredAnimes.sort((a, b) => a.id - b.id); // Más antiguos primero
+    } else if (sortOrder === "DESC") {
+      filteredAnimes.sort((a, b) => b.id - a.id); // Más recientes primero
+    }
   }
+
+  // 3. Calculamos la paginación
+  const totalPages = Math.ceil(filteredAnimes.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedAnimes = filteredAnimes.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const uniqueYears = Array.from(new Set(animes.map(a => a.releaseYear).filter(Boolean))).sort((a, b) => Number(b) - Number(a));
 
   const limpiarFiltros = () => {
-    setFilterGenre(""); setFilterYear(""); setFilterSeason(""); setFilterStatus(""); setSortOrder("");
+    setFilterGenre(""); 
+    setFilterYear(""); 
+    setFilterSeason(""); 
+    setFilterStatus(""); 
+    setSortOrder(""); 
+    setSortBy("NAME"); 
+    setCurrentPage(1); // Volvemos a la primera página al limpiar
   };
 
   if (!isLoaded) {
@@ -102,31 +129,46 @@ export default function CatalogPage() {
             <h1 className="text-3xl md:text-4xl font-black tracking-tighter glow-text mb-1">Catálogo Completo</h1>
             <p className="text-gray-400 text-sm">Explora, filtra y encuentra tu anime favorito.</p>
           </div>
-          <span className="text-sm font-bold text-blue-400 bg-blue-500/10 px-4 py-2 rounded-lg border border-blue-500/20 shadow-sm">
+          <span className="text-sm font-bold text-blue-400 bg-blue-500/10 px-4 py-2 rounded-lg border border-blue-500/20 shadow-sm whitespace-nowrap w-fit">
             {filteredAnimes.length} animes encontrados
           </span>
         </header>
 
-        {/* BARRA DE FILTROS ESTILIZADA */}
-        <div className="glass-panel p-5 rounded-2xl mb-8 shadow-lg border-white/5">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
-            <div className="flex flex-col col-span-2 md:col-span-1 lg:col-span-2">
+        {/* BARRA DE FILTROS ESTILIZADA Y RESPONSIVE */}
+        <div className="glass-panel p-4 md:p-5 rounded-2xl mb-8 shadow-lg border-white/5">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4 items-end">
+            
+            <div className="flex flex-col col-span-2 md:col-span-1 lg:col-span-1">
               <label className="text-[10px] text-gray-400 uppercase font-bold mb-1.5 ml-1">Buscar por Género</label>
-              <select value={filterGenre} onChange={(e) => setFilterGenre(e.target.value)} className="bg-black/50 border border-white/10 text-white px-3 py-2.5 rounded-xl text-sm focus:border-blue-500 outline-none w-full transition-colors cursor-pointer">
+              <select 
+                value={filterGenre} 
+                onChange={(e) => { setFilterGenre(e.target.value); setCurrentPage(1); }} 
+                className="bg-black/50 border border-white/10 text-white px-3 py-2.5 rounded-xl text-sm focus:border-blue-500 outline-none w-full transition-colors cursor-pointer appearance-none"
+              >
                 <option value="">Todos los géneros</option>
                 {PREDEFINED_GENRES.map((g) => <option key={g} value={g}>{g}</option>)}
               </select>
             </div>
+
             <div className="flex flex-col">
               <label className="text-[10px] text-gray-400 uppercase font-bold mb-1.5 ml-1">Año</label>
-              <select value={filterYear} onChange={(e) => setFilterYear(e.target.value)} className="bg-black/50 border border-white/10 text-white px-3 py-2.5 rounded-xl text-sm focus:border-blue-500 outline-none w-full transition-colors cursor-pointer">
+              <select 
+                value={filterYear} 
+                onChange={(e) => { setFilterYear(e.target.value); setCurrentPage(1); }} 
+                className="bg-black/50 border border-white/10 text-white px-3 py-2.5 rounded-xl text-sm focus:border-blue-500 outline-none w-full transition-colors cursor-pointer appearance-none"
+              >
                 <option value="">Todos</option>
                 {uniqueYears.map(year => <option key={year} value={year?.toString()}>{year}</option>)}
               </select>
             </div>
+
             <div className="flex flex-col">
               <label className="text-[10px] text-gray-400 uppercase font-bold mb-1.5 ml-1">Temporada</label>
-              <select value={filterSeason} onChange={(e) => setFilterSeason(e.target.value)} className="bg-black/50 border border-white/10 text-white px-3 py-2.5 rounded-xl text-sm focus:border-blue-500 outline-none w-full transition-colors cursor-pointer">
+              <select 
+                value={filterSeason} 
+                onChange={(e) => { setFilterSeason(e.target.value); setCurrentPage(1); }} 
+                className="bg-black/50 border border-white/10 text-white px-3 py-2.5 rounded-xl text-sm focus:border-blue-500 outline-none w-full transition-colors cursor-pointer appearance-none"
+              >
                 <option value="">Todas</option>
                 <option value="Primavera">Primavera</option>
                 <option value="Verano">Verano</option>
@@ -134,33 +176,56 @@ export default function CatalogPage() {
                 <option value="Invierno">Invierno</option>
               </select>
             </div>
+
             <div className="flex flex-col">
               <label className="text-[10px] text-gray-400 uppercase font-bold mb-1.5 ml-1">Estado</label>
-              <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="bg-black/50 border border-white/10 text-white px-3 py-2.5 rounded-xl text-sm focus:border-blue-500 outline-none w-full transition-colors cursor-pointer">
+              <select 
+                value={filterStatus} 
+                onChange={(e) => { setFilterStatus(e.target.value); setCurrentPage(1); }} 
+                className="bg-black/50 border border-white/10 text-white px-3 py-2.5 rounded-xl text-sm focus:border-blue-500 outline-none w-full transition-colors cursor-pointer appearance-none"
+              >
                 <option value="">Todos</option>
                 <option value="EMISION">En Emisión</option>
                 <option value="FINALIZADO">Finalizado</option>
               </select>
             </div>
+
             <div className="flex flex-col">
-              <label className="text-[10px] text-gray-400 uppercase font-bold mb-1.5 ml-1">Orden</label>
-              <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} className="bg-black/50 border border-white/10 text-white px-3 py-2.5 rounded-xl text-sm focus:border-blue-500 outline-none w-full transition-colors cursor-pointer">
-                <option value="">Por defecto</option>
-                <option value="ASC">A - Z</option>
-                <option value="DESC">Z - A</option>
+              <label className="text-[10px] text-gray-400 uppercase font-bold mb-1.5 ml-1">Ordenar por</label>
+              <select 
+                value={sortBy} 
+                onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }} 
+                className="bg-black/50 border border-white/10 text-white px-3 py-2.5 rounded-xl text-sm focus:border-blue-500 outline-none w-full transition-colors cursor-pointer appearance-none"
+              >
+                <option value="NAME">Nombre</option>
+                <option value="DATE">Fecha</option>
               </select>
             </div>
+
+            <div className="flex flex-col">
+              <label className="text-[10px] text-gray-400 uppercase font-bold mb-1.5 ml-1">Dirección</label>
+              <select 
+                value={sortOrder} 
+                onChange={(e) => { setSortOrder(e.target.value); setCurrentPage(1); }} 
+                className="bg-black/50 border border-white/10 text-white px-3 py-2.5 rounded-xl text-sm focus:border-blue-500 outline-none w-full transition-colors cursor-pointer appearance-none"
+              >
+                <option value="">Por defecto</option>
+                <option value="ASC">Ascendente</option>
+                <option value="DESC">Descendente</option>
+              </select>
+            </div>
+
           </div>
 
-          <div className="mt-5 flex justify-end">
-            <button onClick={limpiarFiltros} className="text-xs text-red-400 hover:text-red-300 font-bold tracking-wider uppercase flex items-center gap-1.5 transition-colors active:scale-95 bg-red-500/10 px-4 py-2 rounded-lg border border-red-500/20">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          <div className="mt-4 md:mt-5 flex justify-end">
+            <button onClick={limpiarFiltros} className="text-[11px] md:text-xs text-red-400 hover:text-red-300 font-bold tracking-wider uppercase flex items-center gap-1.5 transition-colors active:scale-95 bg-red-500/10 px-3 md:px-4 py-2 rounded-lg border border-red-500/20">
+              <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
               Limpiar Filtros
             </button>
           </div>
         </div>
 
-        {/* RESULTADOS (GRILLA FLUIDA) */}
+        {/* RESULTADOS (GRILLA FLUIDA Y PAGINADA) */}
         {filteredAnimes.length === 0 ? (
           <div className="text-center text-gray-500 mt-10 py-16 glass-panel rounded-2xl border-dashed border-white/10">
             <svg className="w-12 h-12 mx-auto text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -168,33 +233,66 @@ export default function CatalogPage() {
             <p className="text-sm mt-1">Intenta ajustando o limpiando los filtros.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 md:gap-5 pb-8">
-            {filteredAnimes.map((anime) => (
-              <Link key={anime.id} href={`/anime/${anime.slug}`} className="block group w-full">
-                <div className="glass-panel rounded-xl overflow-hidden relative aspect-[3/4] shadow-lg transition-transform duration-300 active:scale-95 bg-black border-white/5 hover:border-white/20">
-                  {anime.coverUrl && (
-                    <Image src={anime.coverUrl} alt={anime.title} fill unoptimized className="object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-                  )}
-                  <div className="absolute top-2 right-2 flex flex-col gap-1.5 items-end z-20">
-                    <span className={`text-[9px] font-bold tracking-wider px-2 py-1 rounded-md bg-black/80 backdrop-blur-md border border-white/10 ${anime.status === 'EMISION' ? 'text-red-400' : 'text-gray-300'}`}>
-                      {anime.status === 'EMISION' ? 'EMISIÓN' : 'FINALIZADO'}
-                    </span>
-                    {anime.releaseYear && (
-                      <span className="text-[9px] font-bold text-white bg-blue-600/90 px-2 py-1 rounded-md backdrop-blur-md shadow-md border border-blue-400/30">
-                        {anime.season} {anime.releaseYear}
-                      </span>
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 md:gap-5 pb-8">
+              {paginatedAnimes.map((anime) => (
+                <Link key={anime.id} href={`/anime/${anime.slug}`} className="block group w-full">
+                  <div className="glass-panel rounded-xl overflow-hidden relative aspect-[3/4] shadow-lg transition-transform duration-300 active:scale-95 bg-black border-white/5 hover:border-white/20">
+                    {anime.coverUrl && (
+                      <Image src={anime.coverUrl} alt={anime.title} fill unoptimized className="object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                     )}
+                    <div className="absolute top-2 right-2 flex flex-col gap-1.5 items-end z-20">
+                      <span className={`text-[9px] font-bold tracking-wider px-2 py-1 rounded-md bg-black/80 backdrop-blur-md border border-white/10 ${anime.status === 'EMISION' ? 'text-yellow-400' : 'text-gray-300'}`}>
+                        {anime.status === 'EMISION' ? 'EMISIÓN' : 'FINALIZADO'}
+                      </span>
+                      {anime.releaseYear && (
+                        <span className="text-[9px] font-bold text-white bg-blue-600/90 px-2 py-1 rounded-md backdrop-blur-md shadow-md border border-blue-400/30">
+                          {anime.season} {anime.releaseYear}
+                        </span>
+                      )}
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black via-black/90 to-transparent pt-12 z-20">
+                      <h2 className="text-xs md:text-sm font-bold leading-tight line-clamp-2 text-white shadow-black drop-shadow-md mb-1 group-hover:text-blue-300 transition-colors">
+                        {anime.title}
+                      </h2>
+                      <p className="text-[9px] md:text-[10px] text-blue-400/80 truncate font-semibold">{anime.genre || "Animación"}</p>
+                    </div>
                   </div>
-                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black via-black/90 to-transparent pt-12 z-20">
-                    <h2 className="text-sm md:text-base font-bold leading-tight line-clamp-2 text-white shadow-black drop-shadow-md mb-1 group-hover:text-blue-300 transition-colors">
-                      {anime.title}
-                    </h2>
-                    <p className="text-[10px] text-blue-400/80 truncate font-semibold">{anime.genre || "Animación"}</p>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* CONTROLES DE PAGINACIÓN */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-4 mt-4 mb-12">
+                <button 
+                  onClick={() => {
+                    setCurrentPage((prev) => Math.max(prev - 1, 1));
+                    window.scrollTo({ top: 0, behavior: 'smooth' }); // Sube al inicio al cambiar de página
+                  }}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/10 transition-colors"
+                >
+                  Anterior
+                </button>
+                
+                <span className="text-sm font-medium text-gray-400">
+                  Página <strong className="text-white">{currentPage}</strong> de <strong className="text-white">{totalPages}</strong>
+                </span>
+
+                <button 
+                  onClick={() => {
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+                    window.scrollTo({ top: 0, behavior: 'smooth' }); // Sube al inicio al cambiar de página
+                  }}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/10 transition-colors"
+                >
+                  Siguiente
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
       

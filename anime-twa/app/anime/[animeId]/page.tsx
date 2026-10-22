@@ -122,8 +122,8 @@ export default function AnimeDetailsPage({ params }: { params: Promise<{ animeId
 
         {/* Título y Estado */}
         <div className="flex flex-col items-center md:items-start text-center md:text-left w-full pb-2 flex-1">
-          <span className={`px-3 py-1 text-xs font-bold tracking-wider rounded-md border ${anime.status === 'EMISION' ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-gray-500/20 text-gray-300 border-gray-500/30'} mb-3 inline-block shadow-sm`}>
-            {anime.status === 'EMISION' ? '🔴 EN EMISIÓN' : '⚪ FINALIZADO'}
+          <span className={`px-3 py-1 text-xs font-bold tracking-wider rounded-md border ${anime.status === 'EMISION' ? 'bg-yellow-600/20 text-yellow-500 border-yellow-600/30' : 'bg-red-500/20 text-red-400 border-red-500/30'} mb-3 inline-block shadow-sm`}>
+          {anime.status === 'EMISION' ? '🟡 EN EMISIÓN' : '🔴 FINALIZADO'}
           </span>
           <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tighter leading-tight drop-shadow-lg text-white">
             {anime.title}

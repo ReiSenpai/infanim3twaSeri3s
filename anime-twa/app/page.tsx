@@ -114,10 +114,11 @@ export default function HomePage() {
           <FadeUpSection delayMs={150}>
             <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-white/5 pb-4">
               <div>
+                
+                <h2 className="text-2xl md:text-3xl font-black tracking-tighter glow-text">Últimos episodios</h2>
                 <p className="text-sm text-blue-400 mb-1 font-mono">
-                  {tgUser ? `Hola de nuevo, ${tgUser} ✌️` : "Bienvenido al Hub"}
+                  {tgUser ? `Hola de nuevo, ${tgUser} ✌️` : "Disfruta de los recientes episodios"}
                 </p>
-                <h2 className="text-2xl md:text-3xl font-black tracking-tighter glow-text">Últimos Estrenos</h2>
               </div>
               <Link href="/catalog">
                 <button className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-bold active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(37,99,235,0.3)] border border-blue-400/50">
@@ -148,8 +149,8 @@ export default function HomePage() {
                           <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
                         </div>
                       </div>
-                      <div className="absolute top-2 right-2 bg-red-600/90 backdrop-blur-md px-2 py-1 rounded border border-red-400/50 z-20 shadow-lg">
-                        <span className="text-[10px] font-bold text-white uppercase tracking-wider">Nuevo</span>
+                      <div className="absolute top-2 right-2 bg-green-600/90 backdrop-blur-md px-2 py-1 rounded border border-green-400/50 z-20 shadow-lg">
+                      <span className="text-[10px] font-bold text-white uppercase tracking-wider">Nuevo</span>
                       </div>
                       <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black via-black/80 to-transparent pt-12 z-20">
                         <h3 className="text-sm md:text-base font-bold leading-tight truncate mb-1 text-white drop-shadow-md">{ep.animeTitle}</h3>
@@ -183,8 +184,8 @@ export default function HomePage() {
                         <div className="flex flex-col gap-1 w-full">
                           <h4 className="text-sm font-bold text-gray-200 group-hover:text-white line-clamp-2 leading-tight">{anime.title}</h4>
                           <div className="flex flex-wrap gap-2 mt-1">
-                            <span className={`text-[10px] px-2 py-0.5 rounded font-bold ${anime.status === 'EMISION' ? 'bg-red-500/90 text-white' : 'bg-gray-600/90 text-white'}`}>
-                              {anime.status === 'EMISION' ? 'En Emisión' : 'Concluido'}
+                            <span className={`text-[10px] px-2 py-0.5 rounded font-bold ${anime.status === 'EMISION' ? 'bg-yellow-600/90 text-white' : 'bg-red-500/90 text-white'}`}>
+                            {anime.status === 'EMISION' ? 'En Emisión' : 'Concluido'}
                             </span>
                             <span className="text-[10px] px-2 py-0.5 rounded font-bold bg-blue-500/90 text-white">Serie</span>
                           </div>
