@@ -10,11 +10,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  /* config options here */
-  //allowedDevOrigins: [
-    //"infanimetv.vercel.app",
-    //"localhost:3000"
-  //],
   // Hacemos que Next.js funcione como un puente hacia Spring Boot
   async rewrites() {
     return [
